@@ -144,7 +144,7 @@ router.get("/add-post", authMiddleware, async (req, res) => {
 
 router.post("/add-post/", authMiddleware, async (req, res) => {
   try {
-    connsole.log(req.body);
+    console.log(req.body);
     try {
       const newPost = new Post({
         title: req.body.title,
@@ -162,5 +162,47 @@ router.post("/add-post/", authMiddleware, async (req, res) => {
 
 // GET /edit-post
 // Admin - Update Post
+
+router.get("/edit-post/:id", authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: "edit Post",
+      description: "A blog template made with NodeJS and ExpressJS, and EJS",
+    };
+
+    const data = await Post.findOne({ _id: req.params.id });
+    res.render("admin/edit-post", { locals, data, layout: adminLayout });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// PUT /edit-post
+// Admin - Edit Post
+
+router.put("/edit-post/:id", authMiddleware, async (req, res) => {
+  try {
+    await Post.findByIdAndUpdate(req.params.id, {
+      title: req.body.title,
+      body: req.body.body,
+      updatedAt: Date.now(),
+    });
+    res.redirect(`/dashboard`);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+//DELETE /delete-post
+//Admin - Delete Post
+
+router.delete("/delete-post/:id", authMiddleware, async (req, res) => {
+  try {
+    await Post.deleteOne({ _id: req.params.id });
+    res.redirect("/dashboard");
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 module.exports = router;
